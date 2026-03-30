@@ -4,7 +4,7 @@
 GIT_HASH=$(git rev-parse --short HEAD)
 REPO="portiad/abs-opds"
 
-echo "🚀 Building version: $GIT_HASH for QNAP (AMD64)..."
+echo "🚀 Building version: $GIT_HASH for (AMD64)..."
 
 # 2. Build and Push
 docker buildx build \
