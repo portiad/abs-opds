@@ -213,6 +213,13 @@ app.get('/opds/libraries/:libraryId', authenticateUser, async (req: Request, res
             const dateB = new Date(b.addedAt || 0).getTime();
             return dateB - dateA;
         });
+    } else {
+        // DEFAULT: Sort by Title A-Z
+        parsedItems.sort((a, b) => {
+            const titleA = a.title || '';
+            const titleB = b.title || '';
+            return titleA.localeCompare(titleB, undefined, { sensitivity: 'base', numeric: true });
+        });
     }
     
     // Filter based on query, author, or title if provided
@@ -308,7 +315,8 @@ app.get('/opds/libraries/:libraryId/:type', authenticateUser, async (req: Reques
         req.params.type !== 'authors' &&
         req.params.type !== 'narrators' &&
         req.params.type !== 'genres' &&
-        req.params.type !== 'series'
+        req.params.type !== 'series' &&
+        req.params.type !== 'titles'
     ) {
         res.status(400).send('Invalid type')
         return
@@ -330,6 +338,10 @@ app.get('/opds/libraries/:libraryId/:type', authenticateUser, async (req: Reques
 
     let distinctType = new Set<string>()
     parsedItems.forEach((item: LibraryItem) => {
+        if (req.params.type === 'titles') {
+            // Grab the title directly for a flat list
+            distinctType.add(item.title.trim())
+        }
         if (req.params.type === 'authors') {
             item.authors.forEach((author: any) => {
                 distinctType.add(author.name.trim())
